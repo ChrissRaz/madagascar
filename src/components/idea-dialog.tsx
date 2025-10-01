@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -37,8 +36,6 @@ const regions = [
   "Anosy","Androy","Atsimo-Andrefana","Menabe"
 ];
 
-const quickAnswers = ["Manaiky", "Tsy manaiky", "Mbola mieritreritra"];
-
 export function IdeaDialog({ petition, children, onSign }: SignPetitionDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -46,108 +43,84 @@ export function IdeaDialog({ petition, children, onSign }: SignPetitionDialogPro
 
   const [taona, setTaona] = useState("");
   const [faritra, setFaritra] = useState("");
-  const [valinteny, setValinteny] = useState("");
   const [hevitrao, setHevitrao] = useState("");
+  const [consent, setConsent] = useState(false);
 
-  // const handleSubmit = async () => {
-  //   setIsSaving(true);
-  //   await new Promise(resolve => setTimeout(resolve, 1500));
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-  //   // Simulation save
-  //   console.log({ petitionId: petition._id, taona, faritra, valinteny, hevitrao });
-
-  //   setIsSaving(false);
-  //   setIsSaved(true);
-  //   onSign();
-
-  //   setTimeout(() => {
-  //     setIsSaved(false);
-  //     setOpen(false);
-  //     setTaona("");
-  //     setFaritra("");
-  //     setValinteny("");
-  //     setHevitrao("");
-  //   }, 1200);
-  // };
-
-  useEffect(()=>{
-
-    if(open){
+  useEffect(() => {
+    if (open) {
       setTaona("");
       setFaritra("");
-      setValinteny("");
       setHevitrao("");
+      setConsent(false);
+      setErrors({});
       setIsSaved(false);
       setIsSaving(false);
-    } 
+    }
+  }, [open]);
 
-    console.log(petition);
-    
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
 
-  },[open]);
-
-
-  useEffect(()=>{
-
-    console.log(petition);
-    
-  },[]);
-
-  const handleSubmit = async () => {
-
-    console.log(petition);
-    
-  try {
-    setIsSaving(true);
-
-    const payload = {
-      topicId: petition._id,     // id du topic/urne
-      userId: null,             // tu pourras remplacer par un vrai userId après
-      answer: hevitrao,         // texte de l’idée
-      age: parseInt(taona, 10), // ton champ âge
-      region: faritra,          // ton champ région
-    };
-
-    const res = await fetch("/api/ideas", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      throw new Error(`Erreur API: ${res.status}`);
+    if (!taona || parseInt(taona, 10) <= 0) {
+      newErrors.taona = "Ampidiro ny taonanao marina.";
+    }
+    if (!faritra) {
+      newErrors.faritra = "Misafidiana faritra.";
+    }
+    if (!hevitrao.trim()) {
+      newErrors.hevitrao = "Soraty ny hevitrao, tsy azo foana.";
+    }
+    if (!consent) {
+      newErrors.consent = "Tokony hanamarika ianao fa tsy misy fanarahana na fanangonana angona manokana.";
     }
 
-    const data = await res.json();
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    console.log("Réponse API:", data);
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
 
-    setIsSaving(false);
-    setIsSaved(true);
-    onSign();
+    try {
+      setIsSaving(true);
 
-    setTimeout(() => {
+      const payload = {
+        topicId: petition._id,
+        userId: null,
+        answer: hevitrao,
+        age: parseInt(taona, 10),
+        region: faritra,
+      };
 
-      setIsSaved(false);
-      setOpen(false);
-      setTaona("");
-      setFaritra("");
-      setValinteny("");
-      setHevitrao("");
+      const res = await fetch("/api/ideas", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    }, 1200);
+      if (!res.ok) {
+        throw new Error(`Erreur API: ${res.status}`);
+      }
 
-  } catch (err) {
+      await res.json();
 
-    console.error("Erreur envoi idée:", err);
-    setIsSaving(false);
+      setIsSaving(false);
+      setIsSaved(true);
+      onSign();
 
-  }
-
-};
-
+      setTimeout(() => {
+        setIsSaved(false);
+        setOpen(false);
+      }, 1200);
+    } catch (err) {
+      console.error("Erreur envoi idée:", err);
+      setIsSaving(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -160,9 +133,9 @@ export function IdeaDialog({ petition, children, onSign }: SignPetitionDialogPro
           <DialogDescription>
             {petition.longDescription}
             <div>
-              <strong className="mt-2 block text-orange-300">Torolalana:</strong> Fenoy ny mombamomba anao sy ny hevitrao momba ity sosokevitra ity.
-              Ho an'ny fanatsarana ny serivisy, ny hevitrao dia ho aravona aminy hevitrin'ny vahoka aminy alalan'ny teknolojia "Intelligence Artificielle (IA)".
-              Misaotra mialoha amin'ny fandraisanao anjara!
+              <strong className="mt-2 block text-orange-300">Torolalana:</strong>{" "}
+              Fenoy ny mombamomba anao sy ny hevitrao momba ity sosokevitra ity.
+              Ny valiny dia atao **anonyme** ary tsy misy fanangonana angona manokana.
             </div>
           </DialogDescription>
         </DialogHeader>
@@ -178,6 +151,7 @@ export function IdeaDialog({ petition, children, onSign }: SignPetitionDialogPro
               value={taona}
               onChange={(e) => setTaona(e.target.value)}
             />
+            {errors.taona && <p className="text-red-500 text-sm">{errors.taona}</p>}
           </div>
 
           {/* Faritra */}
@@ -195,24 +169,8 @@ export function IdeaDialog({ petition, children, onSign }: SignPetitionDialogPro
                 ))}
               </SelectContent>
             </Select>
+            {errors.faritra && <p className="text-red-500 text-sm">{errors.faritra}</p>}
           </div>
-
-          {/* Valinteny haingana */}
-          {/* <div>
-            <label className="block text-sm font-medium mb-2">Valinteny haingana</label>
-            <div className="flex gap-2 flex-wrap">
-              {quickAnswers.map((ans) => (
-                <Badge
-                  key={ans}
-                  variant={valinteny === ans ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => setValinteny(ans)}
-                >
-                  {ans}
-                </Badge>
-              ))}
-            </div>
-          </div> */}
 
           {/* Hevitrao */}
           <div>
@@ -223,7 +181,24 @@ export function IdeaDialog({ petition, children, onSign }: SignPetitionDialogPro
               onChange={(e) => setHevitrao(e.target.value)}
               rows={6}
             />
+            {errors.hevitrao && <p className="text-red-500 text-sm">{errors.hevitrao}</p>}
           </div>
+
+          {/* Checkbox anonymat */}
+          <div className="flex items-start gap-2">
+            <input
+              id="consent"
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-1"
+            />
+            <label htmlFor="consent" className="text-sm">
+              Manaiky aho fa tsy misy fanarahana ahy ary tsy misy fanangonana mombamomba manokana. 
+              Anonyme tanteraka ity fandraisana anjara ity.
+            </label>
+          </div>
+          {errors.consent && <p className="text-red-500 text-sm">{errors.consent}</p>}
         </div>
 
         {/* Footer */}

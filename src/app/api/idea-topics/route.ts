@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import IdeaTopic from "@/models/ideaTopic";
 import Idea from "@/models/idea";
-import fs from "fs";
-import path from "path";
+import { bucket } from "@/lib/storage";
+import { v4 as uuidv4 } from "uuid";
+
 
 // Crée un nom unique
 function generateFileName(extension: string) {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${extension}`;
+  return `${uuidv4()}.${extension}`;
 }
 
 export async function POST(req: Request) {
@@ -15,7 +16,7 @@ export async function POST(req: Request) {
   const data = await req.json();
 
   try {
-    let imageUrl = null;
+    let imageUrl: string | null = null;
 
     if (data.imageBase64) {
       // Extraire le header (data:image/png;base64,...)
@@ -29,16 +30,19 @@ export async function POST(req: Request) {
       const extension = mimeType.split("/")[1];
 
       const fileName = generateFileName(extension);
-      const filePath = path.join(process.cwd(), "public", "uploads", fileName);
 
-      // S'assurer que le dossier existe
-      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      // Upload vers ton bucket
+      const file = bucket.file(fileName);
+      await file.save(Buffer.from(base64Data, "base64"), {
+        contentType: mimeType,
+        // public: true,
+        metadata: {
+          cacheControl: "public, max-age=31536000",
+        },
+      });
 
-      // Écrire l'image
-      fs.writeFileSync(filePath, Buffer.from(base64Data, "base64"));
-
-      // URL utilisable par le front
-      imageUrl = `/uploads/${fileName}`;
+      // URL publique
+      imageUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
     }
 
     // Enregistrement DB
@@ -48,15 +52,15 @@ export async function POST(req: Request) {
       longDescription: data.longDescription,
       startDate: data.startDate,
       endDate: data.endDate,
-      imageId: imageUrl, // ici c'est l'URL
+      imageId: imageUrl, // URL depuis GCS
     });
 
     return NextResponse.json(topic, { status: 201 });
   } catch (error) {
-    console.log(JSON.stringify(error, null, 2));
-
+    console.error(error);
     return NextResponse.json({ error: "Erreur création thématique" }, { status: 500 });
   }
+
 }
 
 export async function GET() {

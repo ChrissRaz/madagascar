@@ -38,7 +38,7 @@ export function PetitionCard({ petition }: PetitionCardProps) {
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1">
       <CardHeader className="p-0">
-        <div className="relative aspect-[16/9]">
+        <div className="relative aspect-[16/9] ">
           <Image
             src={petition.imageId}
             alt={petition.title}
