@@ -5,7 +5,7 @@ import Header from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: "Feon'ny Vahoaka",
+  title: "Demôkrasy",
   description: 'Citizen petition platform for Madagascar',
 };
 

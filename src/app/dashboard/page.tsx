@@ -90,7 +90,7 @@ export default function DashboardPage() {
                 <div className="divide-y">
                     {signedList.length > 0 ? (
                         signedList.map((petition) => (
-                            <div key={petition.id} className="flex items-center p-4">
+                            <div key={petition._id} className="flex items-center p-4">
                                 <CheckCircle className="h-5 w-5 text-green-500 mr-4 flex-shrink-0"/>
                                 <div className="flex-1">
                                     <p className="font-medium">{petition.title}</p>

@@ -13,20 +13,21 @@ export default function Home() {
         <main className="text-5xl md:text-6xl font-bold font-headline">
           <h1 className="inline">
             <span className="inline bg-gradient-to-r from-accent to-primary text-transparent bg-clip-text">
-              Feon'ny Vahoaka
+              Demôkrasy
             </span>
           </h1>{' '}
-          The Voice of the People
+          manan-danja ny Feonao.
         </main>
 
         <p className="text-xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0">
-          Empowering citizens of Madagascar to drive change. Start, sign, and share petitions that matter to you and build a better future together.
+          Toerana ahafahanao maneho an-kalalahana ny hevitrao mahakasika ny raharaham-pirenena.
+          Ny feonao no hitarika ny fiovana ary teknolojia "Intelligece Artificielle (IA)" no hanamora izany.
         </p>
 
         <div className="space-y-4 md:space-y-0 md:space-x-4">
           <Button asChild className="w-full md:w-1/3" size="lg">
             <Link href="/petitions">
-              Browse Petitions
+              Haneho hevitra
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

@@ -1,15 +1,27 @@
 export interface Petition {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   longDescription: string;
   signatures: number;
-  imageId: string; // references id in placeholder-images.json
+  imageId: string; 
+  startDate: string,
+  endDate: string,
 }
 
 export interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   phone: string;
+}
+
+
+export interface StatisticsTheme {
+  _id: string;
+  title: string;
+  total: number;
+  ageStats: { range: string; count: number }[];
+  regionStats: { region: string; count: number }[];
+  aiSummary: string;
 }

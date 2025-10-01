@@ -14,14 +14,14 @@ export default function Header() {
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Vote className="h-6 w-6 text-primary" />
           <span className="font-bold font-headline sm:inline-block">
-            Feon'ny Vahoaka
+            Demôkrasy
           </span>
         </Link>
         <nav className="flex-1">
           <ul className="flex items-center gap-4 text-sm font-medium">
             <li>
               <Link href="/petitions" className="text-foreground/80 transition-colors hover:text-foreground">
-                Petitions
+                Vata hevitra
               </Link>
             </li>
             {user && (
@@ -44,12 +44,12 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm">
+              {/* <Button asChild variant="ghost" size="sm">
                 <Link href="/login">Login</Link>
               </Button>
               <Button asChild size="sm">
                 <Link href="/signup">Sign Up</Link>
-              </Button>
+              </Button> */}
             </>
           )}
         </div>

@@ -44,7 +44,7 @@ export function SignPetitionDialog({ petition, children, onSign }: SignPetitionD
     // Simulate signing process and show success
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    signPetition(petition.id);
+    signPetition(petition._id);
     onSign(); // Update local card state
     toast({
       title: 'Petition Signed!',

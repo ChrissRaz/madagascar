@@ -6,24 +6,51 @@ import type { Petition } from '@/lib/definitions';
 import { MOCK_PETITIONS } from '@/lib/mock-data';
 import { Skeleton } from '@/components/ui/skeleton';
 
+
 export default function PetitionsPage() {
   const [petitions, setPetitions] = useState<Petition[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate fetching data
-    const timer = setTimeout(() => {
-      setPetitions(MOCK_PETITIONS);
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
+  // useEffect(() => {
+  //   // Simulate fetching data
+  //   const timer = setTimeout(() => {
+  //     setPetitions(MOCK_PETITIONS);
+  //     setLoading(false);
+  //   }, 1000);
+  //   return () => clearTimeout(timer);
+  // }, []);
+
+    useEffect(() => {
+    const fetchTopics = async () => {
+      try {
+        const res = await fetch("/api/idea-topics", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch topics: ${res.status}`);
+        }
+
+        const data: Petition[] = await res.json();
+        setPetitions(data);
+      } catch (err) {
+        console.error("Error fetching idea topics:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopics();
   }, []);
 
   return (
     <div className="container py-12">
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold font-headline">Active Petitions</h1>
-        <p className="text-muted-foreground mt-2">Join your fellow citizens in making a difference.</p>
+        <h1 className="text-4xl font-bold font-headline">FANEHOAN-KEVITRA MALALAKA</h1>
+        <p className="text-muted-foreground mt-2">Safidio eo ambany ny lohahevitra tianao hanehoana hevitra na vakio ny statistika an'izay lohahevitra efa mikatona.</p>
       </div>
 
       {loading ? (
@@ -44,7 +71,7 @@ export default function PetitionsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {petitions.map((petition) => (
-            <PetitionCard key={petition.id} petition={petition} />
+            <PetitionCard key={petition._id} petition={petition} />
           ))}
         </div>
       )}

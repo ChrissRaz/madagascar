@@ -1,4 +1,4 @@
-# **App Name**: Feon'ny Vahoaka
+# **App Name**: Demôkrasy
 
 ## Core Features:
 
