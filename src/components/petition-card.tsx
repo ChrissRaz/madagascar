@@ -53,6 +53,7 @@ export function PetitionCard({ petition }: PetitionCardProps) {
           <CardDescription className="line-clamp-3">{petition.description}</CardDescription>
         </div>
       </CardHeader>
+      
       <CardContent className="flex-grow p-6 pt-0">
         <div className="flex items-center text-muted-foreground">
           <Users className="h-5 w-5 mr-2 text-primary" />
